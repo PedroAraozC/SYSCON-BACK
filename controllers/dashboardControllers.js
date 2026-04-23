@@ -5,8 +5,13 @@ export const getDashboardStats = async (req, res) => {
   try {
     const pool = await StockConnection();
     connection = await pool.getConnection();
-    const hoy = new Date().toISOString().slice(0, 10);
-
+    const hoy = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    console.log(hoy);
     const [[{ ventasHoy }]] = await connection.execute(
       `SELECT COALESCE(SUM(total), 0) AS ventasHoy 
        FROM ventas WHERE DATE(fecha_alta) = ?`,
@@ -31,7 +36,7 @@ export const getDashboardStats = async (req, res) => {
        ORDER BY total_vendido DESC
        LIMIT 1`,
     );
-    console.log("Stats obtenidos:", { ventasHoy, bajoStock, movimientosHoy, masVendido });
+    // console.log("Stats obtenidos:", { ventasHoy, bajoStock, movimientosHoy, masVendido });
 
     res.json({
       ventasHoy,
