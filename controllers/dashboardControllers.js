@@ -11,7 +11,7 @@ export const getDashboardStats = async (req, res) => {
       month: "2-digit",
       day: "2-digit",
     }).format(new Date());
-    console.log(hoy);
+    // console.log(hoy);
     const [[{ ventasHoy }]] = await connection.execute(
       `SELECT COALESCE(SUM(total), 0) AS ventasHoy 
        FROM ventas WHERE DATE(fecha_alta) = ?`,
