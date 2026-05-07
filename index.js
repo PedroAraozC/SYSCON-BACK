@@ -7,8 +7,6 @@ moment.tz.setDefault("America/Argentina/Buenos_Aires");
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT;
-import fs from "fs";
-import https from "https";
 import productosRoutes from "./routes/productosRoutes.js";
 import categoriasRoutes from "./routes/categoriasRoutes.js";
 import movimientosStockRoutes from "./routes/movimientosStockRoutes.js";
@@ -17,7 +15,12 @@ import MetodosDePagoRoutes from "./routes/metodosDePagoRoutes.js";
 import cajaRoutes from "./routes/cajaRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://syscon.alwaysdata.net", "http://localhost:5173"],
+    credentials: true,
+  }),
+);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,14 +29,31 @@ app.get("/", (req, res) => {
   res.send("API funcionando");
 });
 
-app.use("/productos", productosRoutes);
-app.use("/categorias", categoriasRoutes);
-app.use("/movimientosStock", movimientosStockRoutes);
-app.use("/tipoMovimiento", tipoMovimientoRoutes);
-app.use("/metodosDePago", MetodosDePagoRoutes);
-app.use("/venta", cajaRoutes);
-app.use("/dashboard", dashboardRoutes);
+app.use("/BackEnd/productos", productosRoutes);
+app.use("/BackEnd/categorias", categoriasRoutes);
+app.use("/BackEnd/movimientosStock", movimientosStockRoutes);
+app.use("/BackEnd/tipoMovimiento", tipoMovimientoRoutes);
+app.use("/BackEnd/metodosDePago", MetodosDePagoRoutes);
+app.use("/BackEnd/venta", cajaRoutes);
+app.use("/BackEnd/dashboard", dashboardRoutes);
 
-app.listen(PORT, () => {
+console.log("PORT:", process.env.PORT);
+console.log("ENV:", process.env.NODE_ENV);
+
+const IP = process.env.IP || "0.0.0.0";
+
+app.listen(PORT, IP, () => {
   console.log(`Servidor en puerto ${PORT}`);
+});
+
+setInterval(() => {
+  console.log("Servidor vivo");
+}, 30000);
+
+process.on("uncaughtException", (err) => {
+  console.error("ERROR NO CAPTURADO:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("PROMESA RECHAZADA:", err);
 });
